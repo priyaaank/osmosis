@@ -1,0 +1,74 @@
+{
+    "templates": [
+        {
+            "templateName": "Uber",
+            "matchers": {
+                "matcherType": "conditionalMatcher",
+                "condition": "and",
+                "expressions": [
+                    {
+                        "matcherType": "oneWordMatcher",
+                        "words": "one,two"
+                    },
+                    {
+                        "matcherType": "allWordsMatcher",
+                        "words": "word1,word2"
+                    },
+                    {
+                        "matcherType":"conditionalMatcher",
+                        "condition": "or",
+                        "expressions": [
+                            {
+                                "matcherType": "oneWordMatcher",
+                                "words": "expr1,nested"
+                            },
+                            {
+                                "matcherType": "allWordsMatcher",
+                                "words": "expr2,nested"
+                            }
+                        ]
+                    },
+                    {
+                        "matcherType": "regexMatcher",
+                        "regexExpression": "blueismine"
+                    }
+                ]
+            },
+            "sections" : [
+                {
+                    "contentSelector": {
+                        "selectorType": "textBlockSelector",
+                        "fromText" : "Net Amount",
+                        "tillText": "Gross Amount",
+                        "contentSelector" : {
+                            "selectorType": "lineNumberSelector",
+                            "fromLine": "2",
+                            "toLine": "4",
+                            "contentSelector": {
+                                "selectorType":"regexSelector",
+                                "regex": "",
+                                "groupNumber": 0
+                            }
+                        }
+                    },
+                    "contentExtractors": [
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "\\s+",
+                            "attributeName": "amount",
+                            "defaultValue": "0.0",
+                            "groupNumber": 1
+                        },
+                        {
+                            "extractorType": "delimiterExtractor",
+                            "delimiter": " ",
+                            "valuePosition": 2,
+                            "attribute": "invoiceDate",
+                            "expectedType": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
