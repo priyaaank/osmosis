@@ -114,13 +114,13 @@ func (cm *conditionalMatcher) asContentMatcher() contentMatcher {
 
 func (caowm *containsAtleastOneWordMatcher) asContentMatcher() contentMatcher {
 	return func(c Content) bool {
-		for _, word := range c.Words {
-			for _, wrdToMatch := range caowm.Words {
-				if strings.EqualFold(word, wrdToMatch) {
-					return true
-				}
+		// for _, word := range c.Words {
+		for _, wrdToMatch := range caowm.Words {
+			if strings.Contains(c.OriginalText, wrdToMatch) {
+				return true
 			}
 		}
+		// }
 		return false
 	}
 }
@@ -129,11 +129,11 @@ func (cawm *containsAllWordsMatcher) asContentMatcher() contentMatcher {
 	return func(c Content) bool {
 		for _, wrdToMatch := range cawm.Words {
 			isFound := false
-			for _, word := range c.Words {
-				if strings.EqualFold(word, wrdToMatch) {
-					isFound = true
-				}
+			// for _, word := range c.Words {
+			if strings.Contains(c.OriginalText, wrdToMatch) {
+				isFound = true
 			}
+			// }
 			if !isFound {
 				return false
 			}

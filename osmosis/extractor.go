@@ -62,7 +62,7 @@ func (re regexExtractor) asContentExtractor() contentExtractor {
 
 		for k, val := range result {
 			if int64(k) == re.GroupNumber {
-				extractedContent.AttributeValue = val
+				extractedContent.AttributeValue = strings.TrimSpace(val)
 				return extractedContent
 			}
 		}

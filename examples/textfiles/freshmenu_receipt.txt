@@ -1,0 +1,59 @@
+Invoice No: FM-KA-4931389
+
+CUSTOMER DETAILS
+
+Name:
+Juhi Chawla
+
+Phone No:
+8899776655
+
+Address:
+Juhi Chawla Serendipity Offices, Rose block, 11th Floor, Road 9, Balaji Colony, Shanghai Nagar, Bengaluru, Karnataka 568885, India Bengaluru, Karnataka
+
+ORDER DETAILS
+Order No:
+FM4931389
+
+HSN Code:
+1234
+
+GST IN:
+29BBZZF8899Q0ZQ
+
+Payment Mode:
+Online
+
+Payment Status: Payment Status:
+Paid
+ITEM DETAILS
+Item Name
+
+Order Time:
+
+Delivery Time:
+
+Delivered by:
+
+Wed, 16 May 2018, 10:17 AM Wed, 16 May 2018, 11:53 AM SHALEEN
+
+Quantity
+
+Teriyaki Chicken Rice Bowl (Non Veg)
+
+1
+
+Total Price: Discount:
+Convenience Fee
+Net Total: CGST(2.5%) SGST(2.5%)
+Amount Payable:
+
+Price
+140.0
+140.0 0.0 0.0
+147.0 3.5 3.5
+147.0
+
+We are abiding by some statutory requirements which is below! Reg Name: Food Vista India Pvt. Ltd. CIN: U15209KA2014PTC075887 PAN: AACCF4496Q Reg.Off Add: No 6, Idiqube Delta, 14th Main Road, 5th Sector, HSR Layout, Bangalore - 560102
+
+Write to orders@freshmenu.com 

@@ -1,36 +1,28 @@
 {
     "templates": [
         {
-            "templateName": "Uber",
+            "templateName": "FreshMenu",
             "matchers": {
                 "matcherType": "conditionalMatcher",
                 "condition": "and",
                 "expressions": [
-                    {
-                        "matcherType": "oneWordMatcher",
-                        "words": "one,two"
-                    },
-                    {
-                        "matcherType": "allWordsMatcher",
-                        "words": "word1,word2"
-                    },
                     {
                         "matcherType":"conditionalMatcher",
                         "condition": "or",
                         "expressions": [
                             {
                                 "matcherType": "oneWordMatcher",
-                                "words": "expr1,nested"
+                                "words": "Serendipity,Shanghai"
                             },
                             {
                                 "matcherType": "allWordsMatcher",
-                                "words": "expr2,nested"
+                                "words": "29BBZZF8899Q0ZQ,U15209KA2014PTC075887"
                             }
                         ]
                     },
                     {
-                        "matcherType": "regexMatcher",
-                        "regexExpression": "blueismine"
+                        "matcherType": "oneWordMatcher",
+                        "words": "HSR Layout,orders@freshmenu.com"
                     }
                 ]
             },
@@ -38,15 +30,15 @@
                 {
                     "contentSelector": {
                         "selectorType": "textBlockSelector",
-                        "fromText" : "Net Amount",
-                        "tillText": "Gross Amount",
+                        "fromText" : "CUSTOMER DETAILS",
+                        "toText": "HSN Code",
                         "contentSelector" : {
                             "selectorType": "lineNumberSelector",
-                            "fromLine": "2",
-                            "toLine": "4",
+                            "fromLine": 1,
+                            "toLine": 14,
                             "contentSelector": {
                                 "selectorType":"regexSelector",
-                                "regex": "",
+                                "regex": "[\w\W]+",
                                 "groupNumber": 0
                             }
                         }
@@ -54,17 +46,24 @@
                     "contentExtractors": [
                         {
                             "extractorType": "regexExtractor",
-                            "regex": "\\s+",
-                            "attributeName": "amount",
-                            "defaultValue": "0.0",
+                            "regex": "Name:\s+([A-z\s]+)\n",
+                            "attributeName": "name",
+                            "defaultValue": "NA",
                             "groupNumber": 1
                         },
                         {
-                            "extractorType": "delimiterExtractor",
-                            "delimiter": " ",
-                            "valuePosition": 2,
-                            "attribute": "invoiceDate",
-                            "expectedType": "string"
+                            "extractorType": "regexExtractor",
+                            "regex": "(FM[\d]+)",
+                            "attributeName": "invoiceNumber",
+                            "defaultValue": "NA",
+                            "groupNumber": 1
+                        },
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "\n([\d]+)\n",
+                            "attributeName": "phoneNumber",
+                            "defaultValue": "NA",
+                            "groupNumber": 1
                         }
                     ]
                 }
