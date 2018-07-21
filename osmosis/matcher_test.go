@@ -86,7 +86,7 @@ var negativeConfig = `{
 `
 
 func TestContainsAtleastOneWordMatcherReturnsTrueWhenEvenOneWordIsPresentInContent(t *testing.T) {
-	wordsExpected := []string{"ola", "XXX"}
+	wordsExpected := []string{"Ola", "XXX"}
 	c := Content{OriginalText: contentString}
 	c.prepare()
 
@@ -114,7 +114,7 @@ func TestContainsAtleastOneWordMatcherReturnsFalseWhenNoneOfTheWordsArePresentIn
 }
 
 func TestContainsAllWordMatcherReturnsTrueWhenAllWordsArePresentInContent(t *testing.T) {
-	wordsExpected := []string{"ola", "convenience", "sgst"}
+	wordsExpected := []string{"Ola", "Convenience", "SGST"}
 	c := Content{OriginalText: contentString}
 	c.prepare()
 

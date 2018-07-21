@@ -1,0 +1,3 @@
+package: github.com/priyaaank/osmosis
+import:
+- package: github.com/buger/jsonparser

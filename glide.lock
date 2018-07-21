@@ -1,0 +1,6 @@
+hash: d9be19882df21c5623ccf12500e38532a2efb3d459ceac097129c25c39459d8b
+updated: 2018-07-21T19:20:46.393225+05:30
+imports:
+- name: github.com/buger/jsonparser
+  version: 2cac668e8456b4284edb0715e17e2af02d3ec993
+testImports: []
