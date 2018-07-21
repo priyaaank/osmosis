@@ -1,8 +1,9 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=79070b08c9375a4de78dddf3a15c203db30497085d9ee9a886da9d77c80e65f7
 language: go
-
 go:
   - "1.10"
-
 script: 
   - go get -t github.com/Masterminds/glide
   - glide install
