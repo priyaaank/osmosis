@@ -6,4 +6,7 @@ go:
 script: 
   - go get -t github.com/Masterminds/glide
   - glide install
-  - go test ./osmosis
+  - go test -coverprofile c.out ./osmosis
+
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
