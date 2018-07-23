@@ -355,6 +355,143 @@ Invoice No FM-KA-4931389 generated on 12/01/2018
     "invoiceNumber": "FM-KA-4931389"
 }
 ```
+### Complete sample config
+
+This is how a sample config looks like with all elements in place.
+
+```js
+{
+    "templates": [
+        {
+            "templateName": "FreshMenu",
+            "matchers": {
+                "matcherType": "conditionalMatcher",
+                "condition": "and",
+                "expressions": [
+                    {
+                        "matcherType":"conditionalMatcher",
+                        "condition": "or",
+                        "expressions": [
+                            {
+                                "matcherType": "oneWordMatcher",
+                                "words": "Serendipity,Shanghai"
+                            },
+                            {
+                                "matcherType": "allWordsMatcher",
+                                "words": "29BBZZF8899Q0ZQ,U15209KA2014PTC075887"
+                            }
+                        ]
+                    },
+                    {
+                        "matcherType": "oneWordMatcher",
+                        "words": "HSR Layout,orders@freshmenu.com"
+                    }
+                ]
+            },
+            "sections" : [
+                {
+                    "contentSelector": {
+                        "selectorType": "textBlockSelector",
+                        "fromText" : "CUSTOMER DETAILS",
+                        "toText": "HSN Code",
+                        "contentSelector" : {
+                            "selectorType": "lineNumberSelector",
+                            "fromLine": 1,
+                            "toLine": 14,
+                            "contentSelector": {
+                                "selectorType":"regexSelector",
+                                "regex": "[\w\W]+",
+                                "groupNumber": 0
+                            }
+                        }
+                    },
+                    "contentExtractors": [
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "Name:\s+([A-z\s]+)\n",
+                            "attributeName": "name",
+                            "defaultValue": "NA",
+                            "groupNumber": 1
+                        },
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "(FM[\d]+)",
+                            "attributeName": "invoiceNumber",
+                            "defaultValue": "NA",
+                            "groupNumber": 1
+                        },
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "\n([\d]+)\n",
+                            "attributeName": "phoneNumber",
+                            "defaultValue": "NA",
+                            "groupNumber": 1
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "templateName": "UberIndia",
+            "matchers": {
+                "matcherType": "oneWordMatcher",
+                "words": "Uber India Systems,Invoice issued by Uber"
+            },
+            "sections" : [
+                {
+                    "contentSelector": {
+                        "selectorType": "textBlockSelector",
+                        "fromText" : "Invoice Number",
+                        "toText": "Tax Amount",
+                        "contentSelector" : {
+                            "selectorType": "lineNumberSelector",
+                            "fromLine": 1,
+                            "toLine": 10
+                        }
+                    },
+                    "contentExtractors": [
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "Invoice\s+Number:\s+([a-zA-Z0-9]+-[0-9]+-[0-9]+-[0-9]+)",
+                            "attributeName": "invoiceNumber",
+                            "defaultValue": "NA",
+                            "groupNumber": 1
+                        },
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "Invoice issued by Uber[\S\s]+:\n([a-zA-Z\s]+)\n",
+                            "attributeName": "driverName",
+                            "defaultValue": "NA",
+                            "groupNumber": 1
+                        }
+                    ]
+                },
+                {
+                    "contentSelector": {
+                        "selectorType": "textBlockSelector",
+                        "fromText" : "Gross Amount",
+                        "toText": "Category of services",
+                        "contentSelector" : {
+                            "selectorType": "lineNumberSelector",
+                            "fromLine": 4
+                        }
+                    },
+                    "contentExtractors": [
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "(\d+.\d+)[\D\W\s]+(\d+.\d+)[\D\W\s]+(\d+.\d+)",
+                            "attributeName": "totalAmount",
+                            "defaultValue": "NA",
+                            "groupNumber": 3
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+
+```
 
 ## Developer setup for contribution
 
