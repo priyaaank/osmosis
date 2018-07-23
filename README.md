@@ -17,17 +17,36 @@ To install osmosis you can run following command
 
 `go get -t github.com/priyaaank/osmosis/osmosis`
 
-### Adding a new template
-
-<TBD>
-
 ### Usage
 
-<TBD>
+Config templates can be stored anywhere in your program as long as the path to file is provided to load the configuration while initialization. Following is a quick example of how a config containing templates can be used to parse and extract fields from a text file. 
+
+```
+package main
+
+func main() {
+
+    templates := osmosis.LoadConfigFile("/some/path/on/disk/project/config/osmosisconfig.json")
+    contentToParse, _ :=  ioutil.ReadFile("/some/path/on/disk/project/inputfiles/sample.txt")
+    extractedContent := templates.ParseText(string(cpntentToParse))
+    
+    for _, info := range extractedInfo {
+		fmt.Printf("AttrName: %s | AttrValue: %s", info.AttributeName, info.AttributeValue)
+		fmt.Println("")
+	}
+
+}
+```
+
+Alternatively the config can also be provided as an `[]byte` input to the `osmosis.LoadConfig()` method.  
 
 ### Examples
 
-<TBD>
+You can find several examples implemented [here](https://github.com/priyaaank/osmosis/tree/master/examples)
+
+### Adding a new template
+
+ToDo - Add details
 
 ## Overview & examples
 
@@ -309,3 +328,4 @@ Invoice No FM-KA-4931389 generated on 12/01/2018
 ## Contributing
 
 <TBD>
+
