@@ -9,8 +9,7 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 script: 
-  - go get -t github.com/Masterminds/glide
-  - glide install
+  - dep ensure
   - go test -coverprofile c.out ./osmosis
 
 after_script:
