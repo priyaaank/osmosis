@@ -214,9 +214,12 @@ To the rain in the mountain.
 
 #### LineNumberSelector
 
-This selects the content from the `fromLine`, including the content of `fromLine` till the content of `toLine`, including the content of `toLine`. If the start line is in negative somehow, the content from the first line is selected. Similarly, if the `toLine` is not in range, the content till last line is selected. 
+This selects the content from the `fromLine`, including the content of `fromLine` till the content of `toLine`, including the content of `toLine`. If the start line is in negative somehow, the content from the first line is selected. Similarly, if the `toLine` is not in range, the content till last line is selected.  
 
-It is important to note that LineNumberSelector, when nested, uses the line number for the content selected by previous selector and not original selector. 
+There are few things that should be noted around LineNumberSelector
+
+* When nested, uses the line number for the content selected by previous selector and not original selector.
+* The line numbers should be integers in config. If they are not, currently program does not raise an error but processes them by substituting the line numbers to be 0. A fix will be made to address this issue soon. 
 
 > Example : Sample content below
 
