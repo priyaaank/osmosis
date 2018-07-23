@@ -21,7 +21,7 @@ To install osmosis you can run following command
 
 Config templates can be stored anywhere in your program as long as the path to file is provided to load the configuration while initialization. Following is a quick example of how a config containing templates can be used to parse and extract fields from a text file. 
 
-```
+```go
 package main
 
 func main() {
@@ -65,7 +65,7 @@ Matcher is a block of configuration that pairs a textual document with a configu
 
 This is one of the simplest matcher of all. For a list of given words in configuration, it matches one of the words. If even one of the words is found in the provided input document, it returns a positive match. The words in the list can be space containing text fragments, seperated by a comma (`,`). An example of configuration for a One word matcher is as follows:
 
-```
+```js
 {
     "matcherType": "oneWordMatcher",
     "words": "One upon a time,Harry Potter"
@@ -93,7 +93,7 @@ potter.
 
 Similar to one word matcher, all words matcher requires that all words or text fragments be found in the provided text for a positive match. If all of the words are found in the provided input document, it returns a positive match. The words in the list can be space containing text fragments, seperated by a comma (`,`). An example of configuration for a All words matcher is as follows:
 
-```
+```js
 {
     "matcherType": "allWordsMatcher",
     "words": "One upon a time,Harry Potter"
@@ -122,7 +122,7 @@ Similar to previous matcher, regex matcher, matches text in the provided input. 
 
 Sample configuration for regex matcher looks like as follows:
 
-```
+```js
 {
     "matcherType": "regexMatcher",
     "words": "(H|h)arry\s[A-z]{6}"
@@ -144,7 +144,7 @@ If both conditions are true above, then it matches the template name `Freshmenu`
 
 > Sample configuration in JSON DSL
 
-```
+```js
 "matchers": {
     "matcherType": "conditionalMatcher",
     "condition": "and",
@@ -187,7 +187,7 @@ Text block selector is a simple selector that takes `fromText` and `toText` attr
 
 > A sample configuration for TextBlockSelector will be:
 
-```
+```js
 "contentSelector": {
     "selectorType": "textBlockSelector",
     "fromText" : "Listening",
@@ -229,7 +229,7 @@ To the rain in the mountain.
 
 > Configured nested line selector
 
-```
+```js
 "contentSelector": {
     "selectorType": "textBlockSelector",
     "fromText" : "Listening",
@@ -265,7 +265,7 @@ Regex Selector is a selector that uses a regex expression to select a block of t
 
 A sample configuration for RegexSelector looks as follows
 
-```
+```js
 "contentSelector": {
     "selectorType": "regexSelector",
     "regex" : "Listening,([\w\s]+),",
@@ -300,7 +300,7 @@ Currently the framework supports on a regex extractor. It takes a regex pattern 
 
 A sample extractor config looks like as follows. 
 
-```
+```js
 {
     "extractorType": "regexExtractor",
     "regex": "(FM-KA-[\d]+)",
