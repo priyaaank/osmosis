@@ -28,7 +28,7 @@ func main() {
 
     templates := osmosis.LoadConfigFile("/some/path/on/disk/project/config/osmosisconfig.json")
     contentToParse, _ :=  ioutil.ReadFile("/some/path/on/disk/project/inputfiles/sample.txt")
-    extractedContent := templates.ParseText(string(cpntentToParse))
+    extractedContent := templates.ParseText(string(contentToParse))
     
     for _, info := range extractedInfo {
         fmt.Printf("AttrName: %s | AttrValue: %s \n", info.AttributeName, info.AttributeValue)
@@ -45,7 +45,36 @@ You can find several examples implemented [here](https://github.com/priyaaank/os
 
 ### Adding a new template
 
-ToDo - Add details
+To add a new template in the config file, add a new enrty in templates section. A simple definition would look like as follows. The templates should be separated by commas as multiple elements of an array.
+
+```js
+{
+    "templateName": "FreshMenu",
+    "matchers": {
+        "matcherType": "oneWordMatcher",
+        "words": "Serendipity,Shanghai"
+        }
+    },
+    "sections" : [
+        {
+            "contentSelector": {
+                "selectorType": "textBlockSelector",
+                "fromText" : "CUSTOMER DETAILS",
+                "toText": "HSN Code"
+            },
+            "contentExtractors": [
+                {
+                    "extractorType": "regexExtractor",
+                    "regex": "Name:\s+([A-z\s]+)\n",
+                    "attributeName": "name",
+                    "defaultValue": "NA",
+                    "groupNumber": 1
+                }
+            ]
+        }
+    ]
+}
+```
 
 ## Overview & examples
 
@@ -326,8 +355,3 @@ Invoice No FM-KA-4931389 generated on 12/01/2018
     "invoiceNumber": "FM-KA-4931389"
 }
 ```
-
-## Contributing
-
-<TBD>
-
