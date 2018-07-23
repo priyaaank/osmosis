@@ -1,12 +1,35 @@
 [![Build Status](https://travis-ci.org/priyaaank/osmosis.svg?branch=master)](https://travis-ci.org/priyaaank/osmosis)
 [![Maintainability](https://api.codeclimate.com/v1/badges/2ff78eb41e08b7dff42d/maintainability)](https://codeclimate.com/github/priyaaank/osmosis/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/2ff78eb41e08b7dff42d/test_coverage)](https://codeclimate.com/github/priyaaank/osmosis/test_coverage)
+[![Go Report Card](https://goreportcard.com/badge/github.com/priyaaank/osmosis)](https://goreportcard.com/report/github.com/priyaaank/osmosis)
 
 # Osmosis
 
 A go-lang library to match and extract data based on json templates.
 
-## Overview
+## Getting started
+
+This section will help you get started with Osmosis framework. 
+
+### Installation
+
+To install osmosis you can run following command
+
+`go get -t github.com/priyaaank/osmosis/osmosis`
+
+### Adding a new template
+
+<TBD>
+
+### Usage
+
+<TBD>
+
+### Examples
+
+<TBD>
+
+## Overview & examples
 
 Osmosis is a library written in go-lang to match and extract data based on json templates. It uses a JSON based custom configuration DSL to build templates that can match and extract text from a textual document. Osmosis has three key components in each template that need to be configured. 
 
@@ -283,19 +306,6 @@ Invoice No FM-KA-4931389 generated on 12/01/2018
 }
 ```
 
-## Getting started
+## Contributing
 
-
-### Installation
-
-
-### Adding a new template
-
-
-### Usage
-
-
-### Examples
-
-
-### Reference
+<TBD>
