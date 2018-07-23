@@ -9,13 +9,23 @@ import (
 )
 
 func main() {
-	inputFilePath, err := filepath.Abs("textfiles/freshmenu_receipt.txt")
+	fmt.Println("********************  Uber Receipt *****************************")
+	extractData("textfiles/uber_india_receipt.txt")
+	fmt.Println("******************** Uber Receipt  *****************************\n")
+
+	fmt.Println("******************** Freshmenu Receipt *****************************")
+	extractData("textfiles/freshmenu_receipt.txt")
+	fmt.Println("******************** Freshmenu Receipt *****************************\n")
+}
+
+func extractData(inputFilePath string) {
+	absFilePath, err := filepath.Abs(inputFilePath)
 
 	if err != nil {
 		panic(err)
 	}
 
-	fileContent, err := ioutil.ReadFile(inputFilePath)
+	fileContent, err := ioutil.ReadFile(absFilePath)
 
 	if err != nil {
 		panic(err)

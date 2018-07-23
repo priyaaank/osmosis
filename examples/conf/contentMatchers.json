@@ -68,6 +68,63 @@
                     ]
                 }
             ]
+        },
+        {
+            "templateName": "UberIndia",
+            "matchers": {
+                "matcherType": "oneWordMatcher",
+                "words": "Uber India Systems,Invoice issued by Uber"
+            },
+            "sections" : [
+                {
+                    "contentSelector": {
+                        "selectorType": "textBlockSelector",
+                        "fromText" : "Invoice Number",
+                        "toText": "Tax Amount",
+                        "contentSelector" : {
+                            "selectorType": "lineNumberSelector",
+                            "fromLine": 1,
+                            "toLine": 10
+                        }
+                    },
+                    "contentExtractors": [
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "Invoice\s+Number:\s+([a-zA-Z0-9]+-[0-9]+-[0-9]+-[0-9]+)",
+                            "attributeName": "invoiceNumber",
+                            "defaultValue": "NA",
+                            "groupNumber": 1
+                        },
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "Invoice issued by Uber[\S\s]+:\n([a-zA-Z\s]+)\n",
+                            "attributeName": "driverName",
+                            "defaultValue": "NA",
+                            "groupNumber": 1
+                        }
+                    ]
+                },
+                {
+                    "contentSelector": {
+                        "selectorType": "textBlockSelector",
+                        "fromText" : "Gross Amount",
+                        "toText": "Category of services",
+                        "contentSelector" : {
+                            "selectorType": "lineNumberSelector",
+                            "fromLine": 4
+                        }
+                    },
+                    "contentExtractors": [
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "(\d+.\d+)[\D\W\s]+(\d+.\d+)[\D\W\s]+(\d+.\d+)",
+                            "attributeName": "totalAmount",
+                            "defaultValue": "NA",
+                            "groupNumber": 3
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

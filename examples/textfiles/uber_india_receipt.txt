@@ -1,0 +1,35 @@
+Rangoon Dada
+
+Invoice Number: FABINDIAQ-03-2018-0000012 Invoice Date: 12 July 2018 Place of supply (Name of state): Karnataka HSN Code: 6464
+
+Tax Point Date 12 Jul 2018
+
+Description Transportation service
+Fare
+
+Invoice issued by Uber on behalf of:
+Local Anna Karnataka
+
+Tax Amount
+
+Net Amount
+
+CGST SGST/UTGST
+
+2.5 % 2.5 %
+
+15.62 15.62 Total net
+
+Total CGST Amount
+
+Total SGST/UTGST Amount
+
+Gross Amount
+
+624.59 INR 624.59 INR
+15.62 INR 15.62 INR 655.83 INR
+
+Category of services: Passenger Transport Services Details of person appointed by ECO under GST: Name: Uber India Systems Private Limited Address: Prabhas Legacy, 1st and 2nd Floor, # 77, Survey no. 124/2 N.A.L Wind Tunnel Road, Murugeshpalya, H.A.L POST Bangalore, Karnataka
+GSTIN: 88AABCU8888H8Z8
+
+
