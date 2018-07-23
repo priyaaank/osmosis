@@ -355,3 +355,29 @@ Invoice No FM-KA-4931389 generated on 12/01/2018
     "invoiceNumber": "FM-KA-4931389"
 }
 ```
+
+## Developer setup for contribution
+
+### Installing
+
+Clone the repo
+
+`git clone git@github.com:priyaaank/osmosis.git`
+
+Install glide package manager
+
+`go get -t github.com/Masterminds/glide`
+
+Install dependencies
+
+`glide install`
+
+### Running example
+
+Change to examples dir
+
+`cd examples`
+
+Run the parser file
+
+`go run parser.go`
