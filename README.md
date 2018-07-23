@@ -249,6 +249,39 @@ that evening
 
 ### Extractors
 
+An extractor is a config block that extracts the content for a given key value. The extractor is part of the section in config. The text upon which the extract operates is the one selected by the selector block of the section. This is the final stage of the template extraction. Each extractor works to extract a value for a given key in the cofig. There is an option to provide a default value as well in case a matching value cannot be extracted. Currently extractors do not raise errors when a match is not found in the content and quietly substitute the default value. 
+
+As per the design of JSON config DSL multiple extractors can act and extract data from a selector within each section. All the section contribute to the same key map. The output key map store is flat and contains the keys with their corresponding values extracted by extractors.
+
+#### Regex extractor
+
+Currently the framework supports on a regex extractor. It takes a regex pattern and a group number along with a default value and key name. Group number indicates which matching group should be selected to populate the value.
+
+A sample extractor config looks like as follows. 
+
+```
+{
+    "extractorType": "regexExtractor",
+    "regex": "(FM-KA-[\d]+)",
+    "attributeName": "invoiceNumber",
+    "defaultValue": "NA",
+    "groupNumber": 1
+},
+```
+
+> Sample input content. This will be usually an output of a selector config block
+
+```
+Invoice No FM-KA-4931389 generated on 12/01/2018
+```
+
+> The output from the template selection will be a key value pair of 
+
+```
+{
+    "invoiceNumber": "FM-KA-4931389"
+}
+```
 
 ## Getting started
 
