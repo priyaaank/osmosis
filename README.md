@@ -24,7 +24,7 @@ Matcher is a block of configuration that pairs a textual document with a configu
 
 This is one of the simplest matcher of all. For a list of given words in configuration, it matches one of the words. If even one of the words is found in the provided input document, it returns a positive match. The words in the list can be space containing text fragments, seperated by a comma (`,`). An example of configuration for a One word matcher is as follows:
 
-```js
+```
 {
     "matcherType": "oneWordMatcher",
     "words": "One upon a time,Harry Potter"
@@ -35,25 +35,24 @@ Currently one word matcher does not do case insensitive match. Also, it needs th
 
 > Example 1: Matches as both fragments are found verbatim in the text below. It would have been enough to match only either of the two fragments though.
 
-```text
+```
 Once upon a time 
 There was a boy called Harry Potter. 
 ```
 
 > Example 2 : Does not match because of new line after harry and different case of "O" in Once, and "P" in potter
 
-```text
+```
 once upon a time
 there was a boy called Harry 
 potter.
 ```
 
-
 #### All words matcher
 
 Similar to one word matcher, all words matcher requires that all words or text fragments be found in the provided text for a positive match. If all of the words are found in the provided input document, it returns a positive match. The words in the list can be space containing text fragments, seperated by a comma (`,`). An example of configuration for a All words matcher is as follows:
 
-```js
+```
 {
     "matcherType": "allWordsMatcher",
     "words": "One upon a time,Harry Potter"
@@ -64,14 +63,14 @@ Currently one word matcher **does not do** case insensitive match. Also, it need
 
 > Example 1: Matches as both fragments are found verbatim in the text below.
 
-```text
+```
 Once upon a time 
 There was a boy called Harry Potter. 
 ```
 
 > Example 2 : Does not match because of the case difference of "H" in harry.
 
-```text
+```
 Once upon a time
 there was a boy called harry Potter.
 ```
@@ -82,7 +81,7 @@ Similar to previous matcher, regex matcher, matches text in the provided input. 
 
 Sample configuration for regex matcher looks like as follows:
 
-```js
+```
 {
     "matcherType": "regexMatcher",
     "words": "(H|h)arry\s[A-z]{6}"
@@ -131,6 +130,124 @@ If both conditions are true above, then it matches the template name `Freshmenu`
 }
 ```
 
+### Sections
+
+Once input text has been matched to a configured template using a selector config, the sections of the template are used to select and extract the text. Sections is a list of sections. Each section can contain a single `Selector` and a list of `Extractors`. Each `selector` block selects the part of provided text input. The selector text block is handed over to the extractors. Each extractor extracts the targetted text and returns it in a key value pair format. Both `Selector` and `Extractor` are explained in more details in sections below.
+
+### Selectors
+
+A selector is a configuration block in JSON DSL config which selects a part of the content from the provided input. There will be only one block of selector in a Section, however the selectors can be nested. Each selector obtains the selected block of text from the previous selector and operates on it to provide a selected block of text. There are several types of selectors as explained below.
+
+Each Selector can have a optional child config element called `contentSelector`. This contains a nested selector that operates on the content provided by previous selector. This is how selectors can be nested to do multiple levels of selection.
+
+#### TextBlockSelector
+
+Text block selector is a simple selector that takes `fromText` and `toText` attribute. It finds the first occurance of `fromText` and selects text including the text of fromText. It finds the first occurance of `toText` and selects all the text in between. This selection excludes the text specified in `toText`. If the `fromText` tag is missing from the definition, then content from the beginning is selected. If the `toText` tag is missing, content is selected till be end of the document by default. 
+
+> A sample configuration for TextBlockSelector will be:
+
+```
+"contentSelector": {
+    "selectorType": "textBlockSelector",
+    "fromText" : "Listening",
+    "toText": "Issa"
+}
+```
+
+> Example content
+
+```
+Winter seclusion -
+Listening, that evening,
+To the rain in the mountain.
+- Kobayashi Issa
+```
+
+> Output of selector
+
+```
+Listening, that evening,
+To the rain in the mountain.
+- Kobayashi
+```
+
+#### LineNumberSelector
+
+This selects the content from the `fromLine`, including the content of `fromLine` till the content of `toLine`, including the content of `toLine`. If the start line is in negative somehow, the content from the first line is selected. Similarly, if the `toLine` is not in range, the content till last line is selected. 
+
+It is important to note that LineNumberSelector, when nested, uses the line number for the content selected by previous selector and not original selector. 
+
+> Example : Sample content below
+
+```
+Winter seclusion -
+Listening, that evening,
+To the rain in the mountain.
+- Kobayashi Issa
+```
+
+> Configured nested line selector
+
+```
+"contentSelector": {
+    "selectorType": "textBlockSelector",
+    "fromText" : "Listening",
+    "toText": "Issa",
+    "contentSelector" : {
+        "selectorType": "lineNumberSelector",
+        "fromLine": 1,
+        "toLine": 2
+    }
+}
+```
+
+In the above example the first TextBlockSelector will select following lines.
+
+```
+Listening, that evening,
+To the rain in the mountain.
+- Kobayashi 
+```
+
+The LineBlockSelector will treat line 1 as `Listening, that evening,` and line 2 as `To the rain in the mountain.`. So original line numbers are not applicable with a nested lineNumberSelector. 
+
+> Final output
+
+```
+Listening, that evening,
+To the rain in the mountain.
+```
+
+#### RegexSelector
+
+Regex Selector is a selector that uses a regex expression to select a block of text. It can be nested as needed with other selectors. A regex selector also takes a group number along with the regex expression. If there are multiple groups of matches, the selector can specify which group should be selected. 
+
+A sample configuration for RegexSelector looks as follows
+
+```
+"contentSelector": {
+    "selectorType": "regexSelector",
+    "regex" : "Listening,([\w\s]+),",
+    "groupNumber": 1,
+}
+```
+
+> Input text
+
+```
+Winter seclusion -
+Listening, that evening,
+To the rain in the mountain.
+- Kobayashi Issa
+```
+
+> Output from the previous selector
+
+```
+that evening
+```
+
+### Extractors
 
 
 ## Getting started
