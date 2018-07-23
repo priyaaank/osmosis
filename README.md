@@ -31,9 +31,8 @@ func main() {
     extractedContent := templates.ParseText(string(cpntentToParse))
     
     for _, info := range extractedInfo {
-		fmt.Printf("AttrName: %s | AttrValue: %s", info.AttributeName, info.AttributeValue)
-		fmt.Println("")
-	}
+        fmt.Printf("AttrName: %s | AttrValue: %s \n", info.AttributeName, info.AttributeValue)
+    }
 
 }
 ```
