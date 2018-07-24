@@ -1,3 +1,4 @@
+//Package osmosis allows configured templates to match, select and extract attribute values from textual files
 package osmosis
 
 import (
@@ -22,10 +23,13 @@ type content struct {
 	Words         []string
 }
 
-//Templates should be used
+//Templates is internally a map of configured templates. The key is the name of the template and the value is a template struct object.
+//Method that utilize configured templates can be called on this struct.
 type Templates map[string]template
 
-//ExtractedContent is a key vlue pair
+//ExtractedContent is an object which represents a key value pair. For each configured extractors an ExtractedContent can be returned.
+//AttributeName represents the configured key for the pair.
+//AttributeValue represents the extracted value for the pair.
 type ExtractedContent struct {
 	AttributeName  string
 	AttributeValue string
@@ -41,8 +45,10 @@ type template struct {
 	Sections []section
 }
 
-//LoadConfig I need to have some docs
-//Replace return type from template to an interface.
+//LoadConfig loads the configuration from the provided io.Reader object. It expects the content to be in JSON DSL format as explained in docs.
+//Once loaded, it creates an internal struct containing all relevant information and returns a Templates object.
+//Templates object represent a set of configured templates. Method on this object can be called to parse content to match, select and extract.
+//An error can also be returned when config parsing encounters a problem either with minimum required configuration, syntax invalidity or other errors.
 func LoadConfig(reader io.Reader) (Templates, error) {
 	configString, err := ioutil.ReadAll(reader)
 
@@ -74,7 +80,12 @@ func LoadConfig(reader io.Reader) (Templates, error) {
 	return templates, nil
 }
 
-//ParseText parses the text
+//ParseText takes in a io.Reader object that can provide the content that needs to be matched across templates and then extracted from.
+//It sequentially runs matchers from all templates configured in system. Once a template matches, it applies the selectors and extractors
+//to extract the key value pairs. These key-value pairs are returned as a slice of ExtractedContent.
+//[]ExtractedContent represents a slice of all key-value pairs
+//This method can also return error if there is a problem while parsing the content with the matched template or when a matching template
+//is not found.
 func (t *Templates) ParseText(docReader io.Reader) ([]ExtractedContent, error) {
 
 	docContent, err := ioutil.ReadAll(docReader)
