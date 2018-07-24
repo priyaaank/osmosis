@@ -33,7 +33,7 @@ func main() {
     extractedInfo, err := templates.ParseText(bufio.NewReader(contentFile))
     
     for _, info := range extractedInfo {
-		fmt.Printf("AttrName: %s | AttrValue: %s \n", info.AttributeName, info.AttributeValue)
+        fmt.Printf("AttrName: %s | AttrValue: %s \n", info.AttributeName, info.AttributeValue)
     }
 
 }
