@@ -65,7 +65,7 @@ var testConfig = `{
 `
 
 func TestThatContentPreparationPopulatesWords(t *testing.T) {
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
 	if len(c.Words) != 41 {
@@ -74,7 +74,7 @@ func TestThatContentPreparationPopulatesWords(t *testing.T) {
 }
 
 func TestThatStringIsSanitizedBeforeItIsConvertedToWords(t *testing.T) {
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
 	expected := []string{"ANI", "Technologies", "Pvt.", "Ltd.", "5th", "FloorInfotech", "Center", "Domlur", "Bengaluru", "Karnataka", "560000", "Invoice", "ID", "1IE88NHTQ55547", "Customer", "Name", "Jacob", "Description", "Ola", "Convenience", "Fee", "", "1IE88NHTQ55547", "Convenience", "Fee", "Ride", "Convenience", "Fee", "Play", "Convenience", "Fee8", "CGST", "9.0", "SGST", "9.0", "Total", "Convenience", "Fee", "Fare", "Authorised", "Signatory"}
@@ -91,7 +91,7 @@ func TestThatStringIsSanitizedBeforeItIsConvertedToWords(t *testing.T) {
 }
 
 func TestThatASanitizedCopyOfContentIsStored(t *testing.T) {
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
 	expected := "ANI Technologies Pvt. Ltd. 5th FloorInfotech Center Domlur Bengaluru Karnataka 560000 Invoice ID 1IE88NHTQ55547 Customer Name Jacob Description Ola Convenience Fee  1IE88NHTQ55547 Convenience Fee Ride Convenience Fee Play Convenience Fee8 CGST 9.0 SGST 9.0 Total Convenience Fee Fare Authorised Signatory"
@@ -102,7 +102,11 @@ func TestThatASanitizedCopyOfContentIsStored(t *testing.T) {
 }
 
 func TestThatTemplateIsBuiltWithMatcherSelectorAndExtractors(t *testing.T) {
-	templates := LoadConfig([]byte(testConfig))
+	templates, err := LoadConfig([]byte(testConfig))
+
+	if err != nil {
+		t.Errorf("Did not expect error to be returned. But was %s", err.Error())
+	}
 
 	if len(templates) != 1 {
 		t.Errorf("Expected atleast one template to be returned")
@@ -128,7 +132,12 @@ func TestThatTemplateIsBuiltWithMatcherSelectorAndExtractors(t *testing.T) {
 }
 
 func TestThatKeyValueMapIsReturnedForTextWhenMatchingTemplateIsPresent(t *testing.T) {
-	templates := LoadConfig([]byte(testConfig))
+	templates, err := LoadConfig([]byte(testConfig))
+
+	if err != nil {
+		t.Errorf("Did not expect error to be returned. But was %s", err.Error())
+	}
+
 	keyValuePairs := templates.ParseText(contentString)
 
 	if len(keyValuePairs) != 1 {

@@ -12,10 +12,10 @@ func TestThatTextBlockSelectorSelectsItCorrectly(t *testing.T) {
 		"fromText" : "Pvt.",
 		"toText": "Bengaluru"
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
@@ -31,10 +31,10 @@ func TestThatTextBlockSelectorSelectsWhenItChoosesFirstAndLastWord(t *testing.T)
 		"fromText" : "ANI",
 		"toText": "Signatory"
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
@@ -50,10 +50,10 @@ func TestThatTextBlockSelectorSelectsTillTheEndWhenTillTextIsNotPresent(t *testi
 		"fromText" : "Total",
 		"toText": "NonPresent"
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
@@ -69,10 +69,10 @@ func TestThatTextBlockSelectorSelectsFromBeginningWhenFromTextIsNotPresent(t *te
 		"fromText" : "NotPresent",
 		"toText": "Infotech"
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
@@ -88,10 +88,10 @@ func TestThatContentSelectorForTextBlockSelectorSelectsFromBeginningToEndwhenBot
 		"fromText" : "NotPresent",
 		"toText": "AlsoNotPresent"
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
@@ -105,10 +105,10 @@ func TestThatTextBlockSelectorSelectsFromBeginningToEndwhenFromAndTillTextAreNot
 	positiveSelector := `{
 		"selectorType": "textBlockSelector"
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
@@ -124,10 +124,10 @@ func TestThatLineSelectorWillSelectBetweenSpecifiedLines(t *testing.T) {
 		"fromLine" : 2,
 		"toLine": 3
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
@@ -143,10 +143,10 @@ func TestThatLineSelectorWillSelectTillLastLineWhenToLineIsOutOfBounds(t *testin
 		"fromLine" : 8,
 		"toLine": 100
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
@@ -160,10 +160,10 @@ func TestThatLineSelectorWillSelectFromFirstLineWhenFromLineIsMissing(t *testing
 		"selectorType": "lineNumberSelector",
 		"toLine": 100
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
@@ -176,10 +176,10 @@ func TestThatLineSelectorWillSelectFromStartTillLastLineWhenToLineIsMissing(t *t
 	positiveSelector := `{
 		"selectorType": "lineNumberSelector"
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
@@ -200,10 +200,10 @@ func TestThatNestedSelectorCanBeProvidedAsPartOfConfig(t *testing.T) {
 			"toLine": 5
 		}
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(contentSelector))
+	selector, _ := classifyAndBuildSelector([]byte(contentSelector))
 
 	selectedContent := selector(c)
 

@@ -11,11 +11,11 @@ import (
 func main() {
 	fmt.Println("********************  Uber Receipt *****************************")
 	extractData("textfiles/uber_india_receipt.txt")
-	fmt.Println("******************** Uber Receipt  *****************************\n")
-
+	fmt.Println("******************** Uber Receipt  *****************************")
+	fmt.Println("")
 	fmt.Println("******************** Freshmenu Receipt *****************************")
 	extractData("textfiles/freshmenu_receipt.txt")
-	fmt.Println("******************** Freshmenu Receipt *****************************\n")
+	fmt.Println("******************** Freshmenu Receipt *****************************")
 }
 
 func extractData(inputFilePath string) {
@@ -37,7 +37,11 @@ func extractData(inputFilePath string) {
 		panic(err)
 	}
 
-	templates := osmosis.LoadConfigFile(confFilePath)
+	templates, err := osmosis.LoadConfigFile(confFilePath)
+
+	if err != nil {
+		panic(err)
+	}
 
 	extractedInfo := templates.ParseText(string(fileContent))
 

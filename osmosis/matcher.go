@@ -1,14 +1,15 @@
 package osmosis
 
 import (
-	"errors"
+	"fmt"
+	"log"
 	"regexp"
 	"strings"
 
 	"github.com/buger/jsonparser"
 )
 
-type contentMatcher func(c Content) bool
+type contentMatcher func(c content) bool
 
 type containsAtleastOneWordMatcher struct {
 	Words []string
@@ -27,14 +28,13 @@ type conditionalMatcher struct {
 	Expressions []contentMatcher
 }
 
-func classifyAndBuildMatcher(value []byte) contentMatcher {
-	matcherType, err := jsonparser.GetString(value, "matcherType")
+func classifyAndBuildMatcher(value []byte) (contentMatcher, error) {
+	var matcherType string
+	var err error
 
-	if err != nil {
-		panic(err)
-	}
-
-	if strings.EqualFold(matcherType, "allWordsMatcher") {
+	if matcherType, err = jsonparser.GetString(value, "matcherType"); err != nil {
+		return nil, err
+	} else if strings.EqualFold(matcherType, "allWordsMatcher") {
 		return getAllWordsMatcher(value)
 	} else if strings.EqualFold(matcherType, "oneWordMatcher") {
 		return getOneWordMatcher(value)
@@ -44,52 +44,74 @@ func classifyAndBuildMatcher(value []byte) contentMatcher {
 		return getRegexMatcher(value)
 	}
 
-	panic(errors.New("Unknown matcher type"))
+	return nil, fmt.Errorf("ERROR: Unknown matcher type %s", matcherType)
 }
 
-func getRegexMatcher(value []byte) contentMatcher {
+func getRegexMatcher(value []byte) (contentMatcher, error) {
 	matcher := regexMatcher{}
 
 	if regexExpression, err := jsonparser.GetString(value, "regexExpression"); err != nil {
-		panic(err)
+		return nil, fmt.Errorf("ERROR: Problem building regex matcher. Error is %s", err.Error())
 	} else {
 		matcher.Regex = regexExpression
 	}
 
-	return matcher.asContentMatcher()
+	contentMatcherFunc, err := matcher.asContentMatcher()
+	if err != nil {
+		return nil, err
+	}
+
+	return contentMatcherFunc, nil
 }
 
-func getOneWordMatcher(value []byte) contentMatcher {
+func getOneWordMatcher(value []byte) (contentMatcher, error) {
+	var err error
 	matcher := containsAtleastOneWordMatcher{}
-	matcher.Words = extractWords(value)
-	return matcher.asContentMatcher()
+	if matcher.Words, err = extractWords(value); err != nil {
+		return nil, fmt.Errorf("ERROR: Problem building one word matcher. Error is %s", err.Error())
+	}
+	return matcher.asContentMatcher(), nil
 }
 
-func getAllWordsMatcher(value []byte) contentMatcher {
+func getAllWordsMatcher(value []byte) (contentMatcher, error) {
+	var err error
 	matcher := containsAllWordsMatcher{}
-	matcher.Words = extractWords(value)
-	return matcher.asContentMatcher()
+	if matcher.Words, err = extractWords(value); err != nil {
+		return nil, fmt.Errorf("ERROR: Problem building all words matcher. Error is %s", err.Error())
+	}
+	return matcher.asContentMatcher(), nil
 }
 
-func getConditionalMatcher(value []byte) contentMatcher {
+func getConditionalMatcher(value []byte) (contentMatcher, error) {
+	matcher := conditionalMatcher{}
 	expressions := []contentMatcher{}
 	conditionType, _ := jsonparser.GetString(value, "condition")
+	var parseError error
+
 	jsonparser.ArrayEach(value, func(parsedVal []byte, dataType jsonparser.ValueType, offset int, err error) {
 		if err != nil {
-			panic(err)
+			parseError = err
 		}
-		expressions = append(expressions, classifyAndBuildMatcher(parsedVal))
+		matcher, err := classifyAndBuildMatcher(parsedVal)
+
+		if err != nil {
+			parseError = err
+		}
+		expressions = append(expressions, matcher)
 	}, "expressions")
 
-	matcher := conditionalMatcher{}
+	if parseError != nil {
+		return nil, fmt.Errorf("Could not parse all expressions successfully for conditional matcher, Error is %s", parseError.Error())
+	}
+
 	matcher.Condition = conditionType
 	matcher.Expressions = expressions
 
-	return matcher.asContentMatcher()
+	return matcher.asContentMatcher(), nil
 }
 
 func (cm *conditionalMatcher) asContentMatcher() contentMatcher {
-	return func(c Content) bool {
+	return func(c content) bool {
 		var result bool
 		isFirst := true
 
@@ -113,27 +135,23 @@ func (cm *conditionalMatcher) asContentMatcher() contentMatcher {
 }
 
 func (caowm *containsAtleastOneWordMatcher) asContentMatcher() contentMatcher {
-	return func(c Content) bool {
-		// for _, word := range c.Words {
+	return func(c content) bool {
 		for _, wrdToMatch := range caowm.Words {
 			if strings.Contains(c.OriginalText, wrdToMatch) {
 				return true
 			}
 		}
-		// }
 		return false
 	}
 }
 
 func (cawm *containsAllWordsMatcher) asContentMatcher() contentMatcher {
-	return func(c Content) bool {
+	return func(c content) bool {
 		for _, wrdToMatch := range cawm.Words {
 			isFound := false
-			// for _, word := range c.Words {
 			if strings.Contains(c.OriginalText, wrdToMatch) {
 				isFound = true
 			}
-			// }
 			if !isFound {
 				return false
 			}
@@ -142,27 +160,32 @@ func (cawm *containsAllWordsMatcher) asContentMatcher() contentMatcher {
 	}
 }
 
-func (mrm *regexMatcher) asContentMatcher() contentMatcher {
-	return func(c Content) bool {
-		reg, err := regexp.Compile(mrm.Regex)
+func (mrm *regexMatcher) asContentMatcher() (contentMatcher, error) {
+	compiledRegex, err := regexp.Compile(mrm.Regex)
 
+	if err != nil {
+		return nil, err
+	}
+
+	return func(c content) bool {
 		if err != nil {
-			panic(err)
+			log.Printf("ERROR: Error compiling regex %s. Skipping this match. Returning FALSE", mrm.Regex)
+			return false
 		}
 
-		return reg.MatchString(c.SanitizedText)
-	}
+		return compiledRegex.MatchString(c.SanitizedText)
+	}, nil
 }
 
-func extractWords(value []byte) []string {
+func extractWords(value []byte) ([]string, error) {
 	words := []string{}
 	if wordList, err := jsonparser.GetString(value, "words"); err != nil {
-		panic(err)
+		return nil, err
 	} else {
 		for _, word := range strings.Split(wordList, ",") {
 			words = append(words, word)
 		}
 	}
 
-	return words
+	return words, nil
 }

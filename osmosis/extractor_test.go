@@ -15,10 +15,14 @@ func TestThatRegexExtractorIsUsedToExtractTheValue(t *testing.T) {
 		"defaultValue":"NA",
 		"groupNumber":1
 	}`
-	c := Content{OriginalText: "Bengaluru, Karnataka 560000 Invoice ID 1IE88NHTQ55547"}
+	c := content{OriginalText: "Bengaluru, Karnataka 560000 Invoice ID 1IE88NHTQ55547"}
 	c.prepare()
 
-	extractor := classifyAndBuildExtractor([]byte(invoiceExtractor))
+	extractor, err := classifyAndBuildExtractor([]byte(invoiceExtractor))
+
+	if err != nil {
+		t.Errorf("Did not expect error to be returned. But was %s", err.Error())
+	}
 
 	extractedContent := extractor(c)
 

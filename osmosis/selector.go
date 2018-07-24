@@ -1,11 +1,14 @@
 package osmosis
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
 	"github.com/buger/jsonparser"
 )
+
+type contentSelector func(c content) content
 
 type textBlockSelector struct {
 	FromText string
@@ -22,34 +25,45 @@ type regexSelector struct {
 	GroupNumber  int64
 }
 
-func classifyAndBuildSelector(value []byte) ContentSelector {
-	var contentSelector ContentSelector
+func classifyAndBuildSelector(value []byte) (contentSelector, error) {
+	var selector contentSelector
+	var err error
+	var selectorType string
 
-	selectorType, err := jsonparser.GetString(value, "selectorType")
+	selectorType, err = jsonparser.GetString(value, "selectorType")
+
+	defer func() (contentSelector, error) {
+		if r := recover(); r != nil {
+			return nil, fmt.Errorf("ERROR: Error creating a selectorType of %s. Error is %v", selectorType, r)
+		}
+		return selector, nil
+	}()
 
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf("ERROR: Could not find tag selectorType in config. Error is " + err.Error())
 	}
 
 	if strings.EqualFold(selectorType, "textBlockSelector") {
-		contentSelector = getTextBlockSelector(value).asContentSelector()
+		selector, err = getTextBlockSelector(value).asContentSelector()
 	} else if strings.EqualFold(selectorType, "lineNumberSelector") {
-		contentSelector = getLineNumberSelector(value).asContentSelector()
+		selector, err = getLineNumberSelector(value).asContentSelector()
 	} else if strings.EqualFold(selectorType, "regexSelector") {
-		contentSelector = getRegexSelector(value).asContentSelector()
+		selector, err = getRegexSelector(value).asContentSelector()
 	}
 
 	contentSelectorValue, _, _, err := jsonparser.Get(value, "contentSelector")
 
 	if err != nil {
-		return contentSelector
+		return selector, nil
 	}
 
-	if nestedSelector := classifyAndBuildSelector(contentSelectorValue); nestedSelector != nil {
-		contentSelector = contentSelector.addNestedSelector(nestedSelector)
+	if nestedSelector, err := classifyAndBuildSelector(contentSelectorValue); err != nil {
+		return nil, err
+	} else if nestedSelector != nil {
+		selector = selector.addNestedSelector(nestedSelector)
 	}
 
-	return contentSelector
+	return selector, nil
 }
 
 func getRegexSelector(value []byte) regexSelector {
@@ -91,30 +105,30 @@ func getLineNumberSelector(value []byte) lineNumberSelector {
 	}
 }
 
-func (rs regexSelector) asContentSelector() ContentSelector {
-	return func(c Content) Content {
-		reg, err := regexp.Compile(rs.RegexPattern)
+func (rs regexSelector) asContentSelector() (contentSelector, error) {
+	compiledRegex, err := regexp.Compile(rs.RegexPattern)
 
-		if err != nil {
-			panic(err)
-		}
+	if err != nil {
+		return nil, fmt.Errorf("ERROR: Regex %s for selector did not compile. Error is %s", rs.RegexPattern, err.Error())
+	}
 
-		result := reg.FindStringSubmatch(c.OriginalText)
+	return func(c content) content {
+		result := compiledRegex.FindStringSubmatch(c.OriginalText)
 
 		for k, v := range result {
 			if int64(k) == rs.GroupNumber {
-				newContent := Content{OriginalText: v}
+				newContent := content{OriginalText: v}
 				newContent.prepare()
 				return newContent
 			}
 		}
 
-		return Content{OriginalText: ""}
-	}
+		return content{OriginalText: ""}
+	}, nil
 }
 
-func (lns lineNumberSelector) asContentSelector() ContentSelector {
-	return func(c Content) Content {
+func (lns lineNumberSelector) asContentSelector() (contentSelector, error) {
+	return func(c content) content {
 		lines := strings.Split(c.OriginalText, "\n")
 
 		if lns.FromLine == -1 {
@@ -126,20 +140,20 @@ func (lns lineNumberSelector) asContentSelector() ContentSelector {
 		}
 
 		selectedLines := strings.Join(lines[lns.FromLine-1:lns.ToLine], "\n")
-		newContent := Content{
+		newContent := content{
 			OriginalText: selectedLines,
 		}
 		newContent.prepare()
 		return newContent
-	}
+	}, nil
 }
 
-func (tbs textBlockSelector) asContentSelector() ContentSelector {
-	return func(c Content) Content {
+func (tbs textBlockSelector) asContentSelector() (contentSelector, error) {
+	return func(c content) content {
 		var fromIndex, toIndex int
 
 		if len(c.OriginalText) < 1 {
-			return Content{OriginalText: ""}
+			return content{OriginalText: ""}
 		}
 
 		fromIndex = strings.Index(c.OriginalText, tbs.FromText)
@@ -156,15 +170,15 @@ func (tbs textBlockSelector) asContentSelector() ContentSelector {
 			toIndex = len(c.OriginalText) - 1
 		}
 
-		newContent := Content{OriginalText: c.OriginalText[fromIndex:toIndex]}
+		newContent := content{OriginalText: c.OriginalText[fromIndex:toIndex]}
 		newContent.prepare()
 
 		return newContent
-	}
+	}, nil
 }
 
-func (cs ContentSelector) addNestedSelector(wrappingSelector ContentSelector) ContentSelector {
-	return func(c Content) Content {
+func (cs contentSelector) addNestedSelector(wrappingSelector contentSelector) contentSelector {
+	return func(c content) content {
 		return wrappingSelector(cs(c))
 	}
 }

@@ -1,14 +1,14 @@
 package osmosis
 
 import (
-	"errors"
+	"fmt"
 	"regexp"
 	"strings"
 
 	"github.com/buger/jsonparser"
 )
 
-type contentExtractor func(c Content) ExtractedContent
+type contentExtractor func(c content) extractedContent
 
 type regexExtractor struct {
 	Regex         string
@@ -17,18 +17,18 @@ type regexExtractor struct {
 	GroupNumber   int64
 }
 
-func classifyAndBuildExtractor(value []byte) contentExtractor {
+func classifyAndBuildExtractor(value []byte) (contentExtractor, error) {
 	extractorType, err := jsonparser.GetString(value, "extractorType")
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if strings.EqualFold(extractorType, "regexExtractor") {
 		return getRegexExtractor(value).asContentExtractor()
 	}
 
-	panic(errors.New("Unknown extractor type"))
+	return nil, fmt.Errorf("ERROR: Unknown extractor type %s", extractorType)
 }
 
 func getRegexExtractor(value []byte) regexExtractor {
@@ -45,28 +45,28 @@ func getRegexExtractor(value []byte) regexExtractor {
 	}
 }
 
-func (re regexExtractor) asContentExtractor() contentExtractor {
-	return func(c Content) ExtractedContent {
-		reg, err := regexp.Compile(re.Regex)
+func (re regexExtractor) asContentExtractor() (contentExtractor, error) {
+	compiledRegex, err := regexp.Compile(re.Regex)
+	if err != nil {
+		return nil, fmt.Errorf("ERROR: Could not compile the extractor regex %s", re.Regex)
+	}
 
-		extractedContent := ExtractedContent{
+	return func(c content) extractedContent {
+
+		extractedKeyVal := extractedContent{
 			AttributeName:  re.AttributeName,
 			AttributeValue: re.DefaultValue,
 		}
 
-		if err != nil {
-			panic(err)
-		}
-
-		result := reg.FindStringSubmatch(c.OriginalText)
+		result := compiledRegex.FindStringSubmatch(c.OriginalText)
 
 		for k, val := range result {
 			if int64(k) == re.GroupNumber {
-				extractedContent.AttributeValue = strings.TrimSpace(val)
-				return extractedContent
+				extractedKeyVal.AttributeValue = strings.TrimSpace(val)
+				return extractedKeyVal
 			}
 		}
 
-		return extractedContent
-	}
+		return extractedKeyVal
+	}, nil
 }

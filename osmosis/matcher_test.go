@@ -42,7 +42,25 @@ var positiveConfig = `{
 						]
 					}
 				]
-			}
+			},
+			"sections":[
+				{
+                    "contentSelector": {
+                        "selectorType": "textBlockSelector",
+                        "fromText" : "Invoice Number",
+                        "toText": "Tax Amount",
+                    },
+                    "contentExtractors": [
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "Invoice\s+Number:\s+([a-zA-Z0-9]+-[0-9]+-[0-9]+-[0-9]+)",
+                            "attributeName": "invoiceNumber",
+                            "defaultValue": "NA",
+                            "groupNumber": 1
+						}
+                    ]
+                }
+			]
 		}
     ]
 }
@@ -79,7 +97,25 @@ var negativeConfig = `{
 						"words": "Flight"
 					}
 				]
-			}
+			},
+			"sections":[
+				{
+                    "contentSelector": {
+                        "selectorType": "textBlockSelector",
+                        "fromText" : "Invoice Number",
+                        "toText": "Tax Amount",
+                    },
+                    "contentExtractors": [
+                        {
+                            "extractorType": "regexExtractor",
+                            "regex": "Invoice\s+Number:\s+([a-zA-Z0-9]+-[0-9]+-[0-9]+-[0-9]+)",
+                            "attributeName": "invoiceNumber",
+                            "defaultValue": "NA",
+                            "groupNumber": 1
+						}
+                    ]
+                }
+			]
 		}
     ]
 }
@@ -87,7 +123,7 @@ var negativeConfig = `{
 
 func TestContainsAtleastOneWordMatcherReturnsTrueWhenEvenOneWordIsPresentInContent(t *testing.T) {
 	wordsExpected := []string{"Ola", "XXX"}
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
 	containsWords := containsAtleastOneWordMatcher{
@@ -101,7 +137,7 @@ func TestContainsAtleastOneWordMatcherReturnsTrueWhenEvenOneWordIsPresentInConte
 
 func TestContainsAtleastOneWordMatcherReturnsFalseWhenNoneOfTheWordsArePresentInContent(t *testing.T) {
 	wordsExpected := []string{"Magic", "Close"}
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
 	containsWords := containsAtleastOneWordMatcher{
@@ -115,7 +151,7 @@ func TestContainsAtleastOneWordMatcherReturnsFalseWhenNoneOfTheWordsArePresentIn
 
 func TestContainsAllWordMatcherReturnsTrueWhenAllWordsArePresentInContent(t *testing.T) {
 	wordsExpected := []string{"Ola", "Convenience", "SGST"}
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
 	containsWords := containsAllWordsMatcher{
@@ -129,7 +165,7 @@ func TestContainsAllWordMatcherReturnsTrueWhenAllWordsArePresentInContent(t *tes
 
 func TestContainsAllWordMatcherReturnsFalseWhenEvenOneOfTheWordsIsPresentInContent(t *testing.T) {
 	wordsExpected := []string{"ola", "convenience", "sgss"}
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
 	containsWords := containsAllWordsMatcher{
@@ -143,24 +179,28 @@ func TestContainsAllWordMatcherReturnsFalseWhenEvenOneOfTheWordsIsPresentInConte
 
 func TestThatRegexMatcherReturnsTrueWhenThereIsAtleastOneMatchInContent(t *testing.T) {
 	regexEpr := "Ola\\s+\\w+\\sFee"
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
 	simpleRegexMatcher := regexMatcher{Regex: regexEpr}
 
-	if !simpleRegexMatcher.asContentMatcher()(c) {
+	matcher, _ := simpleRegexMatcher.asContentMatcher()
+
+	if !matcher(c) {
 		t.Errorf("Expected %s to match the regex %s", c.SanitizedText, regexEpr)
 	}
 }
 
 func TestThatRegexMatcherReturnsFalseWhenThereAreNoMatchesInContent(t *testing.T) {
 	regexEpr := "Ola\\sFee"
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
 	simpleRegexMatcher := regexMatcher{Regex: regexEpr}
 
-	if simpleRegexMatcher.asContentMatcher()(c) {
+	matcher, _ := simpleRegexMatcher.asContentMatcher()
+
+	if matcher(c) {
 		t.Errorf("Expected %s to not match the regex %s", c.SanitizedText, regexEpr)
 	}
 }
@@ -168,27 +208,26 @@ func TestThatRegexMatcherReturnsFalseWhenThereAreNoMatchesInContent(t *testing.T
 func TestRegexMatcherShouldThrowErrorWhenRegexIsNotValid(t *testing.T) {
 	expectedError := "error parsing regexp: missing closing ): `(abc`"
 	regexEpr := "(abc"
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
-
-	defer func() {
-		r := recover().(error)
-		if strings.Compare(r.Error(), expectedError) != 0 {
-			t.Errorf("Expected panic to be thrown for an invalid regex expression. Expected error %s was %s", expectedError, r.Error())
-		}
-	}()
 
 	simpleRegexMatcher := regexMatcher{Regex: regexEpr}
 
-	if simpleRegexMatcher.asContentMatcher()(c) {
-		t.Errorf("Expected %s to not match the regex %s", c.SanitizedText, regexEpr)
+	_, err := simpleRegexMatcher.asContentMatcher()
+
+	if err == nil || strings.Compare(err.Error(), expectedError) != 0 {
+		t.Errorf("Expected error %s to be raised", expectedError)
 	}
 }
 
 func TestThatComplexMatcherCombinationIsEvaluatedForPositiveMatch(t *testing.T) {
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
-	templates := LoadConfig([]byte(positiveConfig))
+	templates, err := LoadConfig([]byte(positiveConfig))
+
+	if err != nil {
+		t.Errorf("Did not expect error to be returned. But was %s", err.Error())
+	}
 
 	oldTemplate := templates["Ola"]
 
@@ -205,9 +244,13 @@ func TestThatComplexMatcherCombinationIsEvaluatedForPositiveMatch(t *testing.T) 
 }
 
 func TestThatComplexMatcherCombinationIsEvaluatedForNegativeMatch(t *testing.T) {
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
-	templates := LoadConfig([]byte(negativeConfig))
+	templates, err := LoadConfig([]byte(negativeConfig))
+
+	if err != nil {
+		t.Errorf("Did not expect error to be returned. But was %s", err.Error())
+	}
 
 	oldTemplate := templates["Ola"]
 
@@ -229,10 +272,10 @@ func TestThatRegexMatcherWillReturnMatchedSelection(t *testing.T) {
 		"regex" : "(Convenience Fee[\w\s\(\)%]+CGST\s+([\d.%]+))",
 		"groupNumber": 2
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
@@ -248,10 +291,10 @@ func TestThatRegexMatcherWillReturnEmptyContentWhenNothingMatches(t *testing.T) 
 		"regex" : "(Convenience Fee[\w\s\(\)%]Boo+CGST\s+([\d.%]+))",
 		"groupNumber": 2
 	}`
-	c := Content{OriginalText: contentString}
+	c := content{OriginalText: contentString}
 	c.prepare()
 
-	selector := classifyAndBuildSelector([]byte(positiveSelector))
+	selector, _ := classifyAndBuildSelector([]byte(positiveSelector))
 
 	selectedContent := selector(c)
 
