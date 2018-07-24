@@ -22,9 +22,11 @@ type content struct {
 	Words         []string
 }
 
-type templates map[string]template
+//Templates should be used
+type Templates map[string]template
 
-type extractedContent struct {
+//ExtractedContent is a key vlue pair
+type ExtractedContent struct {
 	AttributeName  string
 	AttributeValue string
 }
@@ -39,7 +41,9 @@ type template struct {
 	Sections []section
 }
 
-func LoadConfig(reader io.Reader) (templates, error) {
+//LoadConfig I need to have some docs
+//Replace return type from template to an interface.
+func LoadConfig(reader io.Reader) (Templates, error) {
 	configString, err := ioutil.ReadAll(reader)
 
 	if err != nil {
@@ -70,7 +74,8 @@ func LoadConfig(reader io.Reader) (templates, error) {
 	return templates, nil
 }
 
-func (t *templates) ParseText(docReader io.Reader) ([]extractedContent, error) {
+//ParseText parses the text
+func (t *Templates) ParseText(docReader io.Reader) ([]ExtractedContent, error) {
 
 	docContent, err := ioutil.ReadAll(docReader)
 
@@ -78,7 +83,7 @@ func (t *templates) ParseText(docReader io.Reader) ([]extractedContent, error) {
 		return nil, err
 	}
 
-	matchingKeyValues := make([]extractedContent, 0)
+	matchingKeyValues := make([]ExtractedContent, 0)
 	templateMap := map[string]template(*t)
 	contentToMatch := content{OriginalText: string(docContent)}
 	contentToMatch.prepare()

@@ -49,12 +49,14 @@ func classifyAndBuildMatcher(value []byte) (contentMatcher, error) {
 
 func getRegexMatcher(value []byte) (contentMatcher, error) {
 	matcher := regexMatcher{}
+	var regexExpression string
+	var err error
 
-	if regexExpression, err := jsonparser.GetString(value, "regexExpression"); err != nil {
+	if regexExpression, err = jsonparser.GetString(value, "regexExpression"); err != nil {
 		return nil, fmt.Errorf("ERROR: Problem building regex matcher. Error is %s", err.Error())
-	} else {
-		matcher.Regex = regexExpression
 	}
+
+	matcher.Regex = regexExpression
 
 	contentMatcherFunc, err := matcher.asContentMatcher()
 	if err != nil {
@@ -179,12 +181,15 @@ func (mrm *regexMatcher) asContentMatcher() (contentMatcher, error) {
 
 func extractWords(value []byte) ([]string, error) {
 	words := []string{}
-	if wordList, err := jsonparser.GetString(value, "words"); err != nil {
+	var wordList string
+	var err error
+
+	if wordList, err = jsonparser.GetString(value, "words"); err != nil {
 		return nil, err
-	} else {
-		for _, word := range strings.Split(wordList, ",") {
-			words = append(words, word)
-		}
+	}
+
+	for _, word := range strings.Split(wordList, ",") {
+		words = append(words, word)
 	}
 
 	return words, nil

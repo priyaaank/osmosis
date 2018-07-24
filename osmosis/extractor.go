@@ -8,7 +8,7 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-type contentExtractor func(c content) extractedContent
+type contentExtractor func(c content) ExtractedContent
 
 type regexExtractor struct {
 	Regex         string
@@ -51,9 +51,9 @@ func (re regexExtractor) asContentExtractor() (contentExtractor, error) {
 		return nil, fmt.Errorf("ERROR: Could not compile the extractor regex %s", re.Regex)
 	}
 
-	return func(c content) extractedContent {
+	return func(c content) ExtractedContent {
 
-		extractedKeyVal := extractedContent{
+		extractedKeyVal := ExtractedContent{
 			AttributeName:  re.AttributeName,
 			AttributeValue: re.DefaultValue,
 		}
