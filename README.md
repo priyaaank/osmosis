@@ -26,12 +26,13 @@ package main
 
 func main() {
 
-    templates := osmosis.LoadConfigFile("/some/path/on/disk/project/config/osmosisconfig.json")
-    contentToParse, _ :=  ioutil.ReadFile("/some/path/on/disk/project/inputfiles/sample.txt")
-    extractedContent := templates.ParseText(string(contentToParse))
+    confFile, _ := os.Open("/some/path/on/disk/project/config/osmosisconfig.json")
+    contentFile, _ := os.Open("/some/path/on/disk/project/inputfiles/sample.txt")
+    templates, err := osmosis.LoadConfig(bufio.NewReader(confFile))
+    extractedInfo, err := templates.ParseText(bufio.NewReader(contentFile))
     
     for _, info := range extractedInfo {
-        fmt.Printf("AttrName: %s | AttrValue: %s \n", info.AttributeName, info.AttributeValue)
+		fmt.Printf("AttrName: %s | AttrValue: %s \n", info.AttributeName, info.AttributeValue)
     }
 
 }
