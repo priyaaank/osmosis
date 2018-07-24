@@ -1,8 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/priyaaank/osmosis/osmosis"
@@ -25,7 +26,7 @@ func extractData(inputFilePath string) {
 		panic(err)
 	}
 
-	fileContent, err := ioutil.ReadFile(absFilePath)
+	contentFile, err := os.Open(absFilePath)
 
 	if err != nil {
 		panic(err)
@@ -37,13 +38,23 @@ func extractData(inputFilePath string) {
 		panic(err)
 	}
 
-	templates, err := osmosis.LoadConfigFile(confFilePath)
+	file, err := os.Open(confFilePath)
 
 	if err != nil {
 		panic(err)
 	}
 
-	extractedInfo := templates.ParseText(string(fileContent))
+	templates, err := osmosis.LoadConfig(bufio.NewReader(file))
+
+	if err != nil {
+		panic(err)
+	}
+
+	extractedInfo, err := templates.ParseText(bufio.NewReader(contentFile))
+
+	if err != nil {
+		panic(err)
+	}
 
 	for _, info := range extractedInfo {
 		fmt.Printf("AttrName: %s | AttrValue: %s \n", info.AttributeName, info.AttributeValue)

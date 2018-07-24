@@ -223,7 +223,7 @@ func TestRegexMatcherShouldThrowErrorWhenRegexIsNotValid(t *testing.T) {
 func TestThatComplexMatcherCombinationIsEvaluatedForPositiveMatch(t *testing.T) {
 	c := content{OriginalText: contentString}
 	c.prepare()
-	templates, err := LoadConfig([]byte(positiveConfig))
+	templates, err := LoadConfig(strings.NewReader(positiveConfig))
 
 	if err != nil {
 		t.Errorf("Did not expect error to be returned. But was %s", err.Error())
@@ -246,7 +246,7 @@ func TestThatComplexMatcherCombinationIsEvaluatedForPositiveMatch(t *testing.T) 
 func TestThatComplexMatcherCombinationIsEvaluatedForNegativeMatch(t *testing.T) {
 	c := content{OriginalText: contentString}
 	c.prepare()
-	templates, err := LoadConfig([]byte(negativeConfig))
+	templates, err := LoadConfig(strings.NewReader(negativeConfig))
 
 	if err != nil {
 		t.Errorf("Did not expect error to be returned. But was %s", err.Error())

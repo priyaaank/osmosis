@@ -102,7 +102,7 @@ func TestThatASanitizedCopyOfContentIsStored(t *testing.T) {
 }
 
 func TestThatTemplateIsBuiltWithMatcherSelectorAndExtractors(t *testing.T) {
-	templates, err := LoadConfig([]byte(testConfig))
+	templates, err := LoadConfig(strings.NewReader(testConfig))
 
 	if err != nil {
 		t.Errorf("Did not expect error to be returned. But was %s", err.Error())
@@ -132,13 +132,17 @@ func TestThatTemplateIsBuiltWithMatcherSelectorAndExtractors(t *testing.T) {
 }
 
 func TestThatKeyValueMapIsReturnedForTextWhenMatchingTemplateIsPresent(t *testing.T) {
-	templates, err := LoadConfig([]byte(testConfig))
+	templates, err := LoadConfig(strings.NewReader(testConfig))
 
 	if err != nil {
 		t.Errorf("Did not expect error to be returned. But was %s", err.Error())
 	}
 
-	keyValuePairs := templates.ParseText(contentString)
+	keyValuePairs, err := templates.ParseText(strings.NewReader(contentString))
+
+	if err != nil {
+		t.Errorf("Did not expect error to be raised but was %s", err.Error())
+	}
 
 	if len(keyValuePairs) != 1 {
 		t.Errorf("Expected at least one key value pair to be returned")

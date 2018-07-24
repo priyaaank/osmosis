@@ -2,6 +2,7 @@ package osmosis
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"regexp"
@@ -38,14 +39,13 @@ type template struct {
 	Sections []section
 }
 
-//LoadConfigFile loads the config from a file. The path of the file is provided to the function as the parameter. The config is expected
-//in the prescribed json format. It returns a Templates object that contains all template declarations internally.
-func LoadConfigFile(filePath string) (templates, error) {
-	templateMatchers, _ := ioutil.ReadFile(filePath)
-	return LoadConfig(templateMatchers)
-}
+func LoadConfig(reader io.Reader) (templates, error) {
+	configString, err := ioutil.ReadAll(reader)
 
-func LoadConfig(configString []byte) (templates, error) {
+	if err != nil {
+		return nil, err
+	}
+
 	templateErrors := make([]error, 0)
 	templates := map[string]template{}
 	jsonparser.ArrayEach(configString, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
@@ -54,7 +54,7 @@ func LoadConfig(configString []byte) (templates, error) {
 			return
 		}
 
-		template, err := ParseTemplate(value)
+		template, err := parseTemplate(value)
 		if err != nil {
 			templateErrors = append(templateErrors, err)
 			return
@@ -70,7 +70,39 @@ func LoadConfig(configString []byte) (templates, error) {
 	return templates, nil
 }
 
-func ParseTemplate(templateDef []byte) (template, error) {
+func (t *templates) ParseText(docReader io.Reader) ([]extractedContent, error) {
+
+	docContent, err := ioutil.ReadAll(docReader)
+
+	if err != nil {
+		return nil, err
+	}
+
+	matchingKeyValues := make([]extractedContent, 0)
+	templateMap := map[string]template(*t)
+	contentToMatch := content{OriginalText: string(docContent)}
+	contentToMatch.prepare()
+
+	for _, template := range templateMap {
+		if !template.Matcher(contentToMatch) {
+			continue
+		}
+
+		for _, section := range template.Sections {
+			selectedContent := section.Selector(contentToMatch)
+
+			for _, extractor := range section.Extractors {
+				matchingKeyValues = append(matchingKeyValues, extractor(selectedContent))
+			}
+
+		}
+
+	}
+
+	return matchingKeyValues, nil
+}
+
+func parseTemplate(templateDef []byte) (template, error) {
 	var templateName string
 	var err error
 	var newTemplate template
@@ -119,32 +151,6 @@ func ParseTemplate(templateDef []byte) (template, error) {
 	newTemplate.Sections = sections
 
 	return newTemplate, nil
-}
-
-func (t *templates) ParseText(docContent string) []extractedContent {
-
-	matchingKeyValues := make([]extractedContent, 0)
-	templateMap := map[string]template(*t)
-	contentToMatch := content{OriginalText: docContent}
-	contentToMatch.prepare()
-
-	for _, template := range templateMap {
-		if !template.Matcher(contentToMatch) {
-			continue
-		}
-
-		for _, section := range template.Sections {
-			selectedContent := section.Selector(contentToMatch)
-
-			for _, extractor := range section.Extractors {
-				matchingKeyValues = append(matchingKeyValues, extractor(selectedContent))
-			}
-
-		}
-
-	}
-
-	return matchingKeyValues
 }
 
 func (c *content) prepare() error {
